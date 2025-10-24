@@ -1,7 +1,3 @@
-Absolutely, Sifuna! Based on the content of your uploaded document, it's already structured quite well for a `README.md` file. But to make it even more polished and Markdown-optimized, here are a few enhancements:
-
----
-
 # ✈️ Flight Phase Detection System
 
 A comprehensive Python tool for automatically detecting and analyzing flight phases from aircraft Flight Data Recorder (FDR) data.
@@ -252,6 +248,4 @@ MIT License — free to use and modify.
 
 Open an issue on the repository for questions or suggestions.
 
----
 
-Let me know if you'd like this broken into separate Markdown files or styled for a documentation site like MkDocs or Docusaurus.
