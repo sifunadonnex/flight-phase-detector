@@ -469,5 +469,6 @@ For questions, issues, or suggestions, please open an issue on the repository.
 ---
 
 **Note**: This tool is for analysis purposes. Always follow proper aviation safety protocols and regulatory requirements when working with actual flight data.
-#   f l i g h t - p h a s e - d e t e c t o r  
+#   f l i g h t - p h a s e - d e t e c t o r 
+ 
  
