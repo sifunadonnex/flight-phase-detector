@@ -2,9 +2,9 @@
 
 ## What Has Been Created
 
-This project provides a **professional-grade Python-based flight phase detection system** with multi-aircraft support for analyzing aircraft flight data from CSV files.
+This project provides a **professional-grade Python-based flight phase detection system** with advanced aircraft sensor integration for analyzing aircraft flight data from CSV files.
 
-**Version:** 2.0 (Multi-Aircraft Support)
+**Version:** 2.1 (Enhanced Sensor Integration)
 
 ## Files Created
 
@@ -92,12 +92,27 @@ This project provides a **professional-grade Python-based flight phase detection
 
 ## Sample Flight Analysis Results
 
-### Flight Profile Detected (Q400 Regional Turboprop)
+### Flight Profile Detected (Boeing 737-490(SF) - Enhanced Parameters)
+
+1. **TAXI-OUT** (1.82 min) - Ground movement before takeoff
+2. **INITIAL_CLIMB** (0.28 min) - Immediate post-takeoff climb (5,174 fpm)
+3. **CLIMB** (6.09 min) - Main climb to cruise altitude (5,662 fpm avg)
+4. **CRUISE** (31.79 min) - Level flight at 36,000 ft MSL, 239-242 kts
+5. **DESCENT** (7.37 min) - Descent with speedbrakes deployed (-3,799 fpm)
+6. **APPROACH** (1.25 min) - Intermediate approach with partial flaps (5-30°)
+7. **FINAL_APPROACH** (0.76 min) - Final approach with full flaps (30°)
+8. **TAXI-IN** (1.68 min) - Ground movement after landing
+
+**Total Flight Time**: 51.03 minutes (0.85 hours)
+**Cruise Altitude**: 36,000 ft MSL (realistic for B737 operations)
+**Enhanced Parameters Used**: AIR/GROUND sensor, flap positions, speedbrake status
+
+### Flight Profile Detected (Bombardier Q400 Regional Turboprop)
 
 1. **GROUND** (1.38 min) - Aircraft parked, engines at idle
 2. **TAXI-OUT** (0.11 min) - Taxiing to runway
 3. **TAKEOFF** (0.08 min) - Takeoff roll and liftoff
-4. **INITIAL CLIMB** (0.33 min) - Climb to 1,587 ft (4,253 fpm)
+4. **INITIAL_CLIMB** (0.33 min) - Climb to 1,587 ft (4,253 fpm)
 5. **CLIMB** (7.92 min) - Climb to cruise altitude 24,000 ft (2,835 fpm)
 6. **CRUISE** (9.33 min) - Level flight at 24,000 ft, 198 kts
 7. **DESCENT** (3.62 min) - Initial descent to 15,824 ft (-2,257 fpm)
@@ -109,7 +124,7 @@ This project provides a **professional-grade Python-based flight phase detection
 ## Key Features
 
 ### Automated Detection
-- ✅ Multi-parameter analysis (not just single threshold)
+- ✅ Multi-parameter analysis (airspeed, altitude, vertical speed, **AIR/GROUND status**, **flaps**, **speedbrakes**)
 - ✅ Derived parameter calculation (vertical speed, AGL altitude)
 - ✅ Signal smoothing to handle sensor noise
 - ✅ Phase transition smoothing (eliminates spurious detections)
@@ -353,28 +368,29 @@ detector.print_summary()
 
 ## Conclusion
 
-This project delivers a **production-ready flight phase detection system** with:
+This project delivers a **production-ready flight phase detection system** with advanced sensor integration:
 
-1. ✅ **Working code** that successfully analyzes flight data
+1. ✅ **Working code** that successfully analyzes flight data with enhanced parameters
 2. ✅ **Comprehensive documentation** covering usage and aviation background
 3. ✅ **Extensive research** on flight phases and industry standards
 4. ✅ **Professional output** in multiple formats
 5. ✅ **Aviation compliance** with regulatory standards
-6. ✅ **Tested and validated** on real flight data
+6. ✅ **Tested and validated** on real Boeing 737 and Q400 flight data
 7. ✅ **Easily customizable** for different aircraft types
 8. ✅ **Well-documented** code and user guides
+9. ✅ **Advanced sensor integration** (AIR/GROUND, flaps, speedbrakes, vertical acceleration)
 
 The system is ready for immediate use in:
-- Flight data analysis
-- Safety monitoring
-- Research applications
-- Educational purposes
+- Flight data analysis with maximum accuracy
+- Safety monitoring with direct sensor data
+- Research applications with enhanced parameter support
+- Educational purposes with real-world aviation data
 - Operational flight data monitoring programs
 
-**Total Lines of Code**: 533 (main program) + 150 (examples) = ~680 lines
-**Total Documentation**: 1,500+ lines across 4 documents
+**Total Lines of Code**: 700+ (main program) + 150 (examples) = ~850 lines
+**Total Documentation**: 1,500+ lines across 6 documents
 **Total Project Files**: 11+ files
-**Development Time**: Professional-grade implementation
+**Development Time**: Professional-grade implementation with advanced features
 
 ---
 

@@ -2,10 +2,10 @@
 FLIGHT PHASE DETECTION REPORT
 ================================================================================
 
-Analysis Date: 2025-10-24 12:26:00
+Analysis Date: 2025-11-20 11:30:34
 Input File: 5Y_TBX_Q400.csv
 Total Data Points: 3724
-Ground Altitude (MSL): 96 feet
+Ground Altitude (MSL): 64 feet
 
 FLIGHT PHASES DETECTED:
 --------------------------------------------------------------------------------
@@ -13,104 +13,88 @@ FLIGHT PHASES DETECTED:
 1. GROUND
    Samples: 1 - 167 (167 samples)
    Duration: 1.39 minutes (83.5 seconds)
-   Altitude Range: 96 - 131 feet
-   Altitude Change: 129 → 131 feet
-   Airspeed Range: 0 → 16 knots (max: 16 kts)
+   Altitude Range: 64 - 130 feet
+   Altitude Change: 128 → 130 feet
+   Airspeed Range: 0 → 0 knots (max: 0 kts)
    Average Vertical Speed: 2 fpm
 
 2. TAKEOFF
    Samples: 168 - 199 (32 samples)
    Duration: 0.27 minutes (16.0 seconds)
-   Altitude Range: 129 - 375 feet
-   Altitude Change: 135 → 375 feet
-   Airspeed Range: 39 → 152 knots (max: 152 kts)
-   Average Vertical Speed: 863 fpm
+   Altitude Range: 126 - 368 feet
+   Altitude Change: 134 → 368 feet
+   Airspeed Range: 38 → 152 knots (max: 152 kts)
+   Average Vertical Speed: 838 fpm
 
 3. INITIAL_CLIMB
-   Samples: 200 - 228 (29 samples)
-   Duration: 0.24 minutes (14.5 seconds)
-   Altitude Range: 404 - 1587 feet
-   Altitude Change: 404 → 1587 feet
-   Airspeed Range: 152 → 168 knots (max: 168 kts)
-   Average Vertical Speed: 4891 fpm
+   Samples: 200 - 227 (28 samples)
+   Duration: 0.23 minutes (14.0 seconds)
+   Altitude Range: 394 - 1524 feet
+   Altitude Change: 394 → 1524 feet
+   Airspeed Range: 151 → 165 knots (max: 165 kts)
+   Average Vertical Speed: 4824 fpm
 
 4. CLIMB
-   Samples: 229 - 1178 (950 samples)
-   Duration: 7.92 minutes (475.0 seconds)
-   Altitude Range: 1620 - 23991 feet
-   Altitude Change: 1620 → 23991 feet
-   Airspeed Range: 168 → 198 knots (max: 212 kts)
-   Average Vertical Speed: 2835 fpm
+   Samples: 228 - 1179 (952 samples)
+   Duration: 7.93 minutes (476.0 seconds)
+   Altitude Range: 1576 - 23984 feet
+   Altitude Change: 1576 → 23984 feet
+   Airspeed Range: 168 → 199 knots (max: 212 kts)
+   Average Vertical Speed: 2837 fpm
 
 5. CRUISE
-   Samples: 1179 - 2299 (1121 samples)
-   Duration: 9.34 minutes (560.5 seconds)
-   Altitude Range: 23985 - 24007 feet
-   Altitude Change: 23991 → 23993 feet
-   Airspeed Range: 199 → 198 knots (max: 212 kts)
-   Average Vertical Speed: -0 fpm
+   Samples: 1180 - 2298 (1119 samples)
+   Duration: 9.32 minutes (559.5 seconds)
+   Altitude Range: 23978 - 24004 feet
+   Altitude Change: 23986 → 23990 feet
+   Airspeed Range: 199 → 197 knots (max: 212 kts)
+   Average Vertical Speed: 0 fpm
 
 6. DESCENT
-   Samples: 2300 - 2726 (427 samples)
-   Duration: 3.56 minutes (213.5 seconds)
-   Altitude Range: 15783 - 23988 feet
-   Altitude Change: 23988 → 15815 feet
-   Airspeed Range: 198 → 190 knots (max: 226 kts)
-   Average Vertical Speed: -2299 fpm
+   Samples: 2299 - 2732 (434 samples)
+   Duration: 3.62 minutes (217.0 seconds)
+   Altitude Range: 15776 - 23988 feet
+   Altitude Change: 23988 → 15816 feet
+   Airspeed Range: 197 → 185 knots (max: 226 kts)
+   Average Vertical Speed: -2257 fpm
 
 7. CRUISE
-   Samples: 2727 - 2744 (18 samples)
-   Duration: 0.15 minutes (9.0 seconds)
-   Altitude Range: 15815 - 15835 feet
-   Altitude Change: 15829 → 15815 feet
-   Airspeed Range: 189 → 180 knots (max: 189 kts)
-   Average Vertical Speed: 53 fpm
+   Samples: 2733 - 2741 (9 samples)
+   Duration: 0.07 minutes (4.5 seconds)
+   Altitude Range: 15820 - 15828 feet
+   Altitude Change: 15820 → 15822 feet
+   Airspeed Range: 185 → 181 knots (max: 185 kts)
+   Average Vertical Speed: -13 fpm
 
 8. DESCENT
-   Samples: 2745 - 2756 (12 samples)
-   Duration: 0.10 minutes (6.0 seconds)
-   Altitude Range: 15760 - 15810 feet
-   Altitude Change: 15810 → 15760 feet
-   Airspeed Range: 180 → 178 knots (max: 180 kts)
-   Average Vertical Speed: -468 fpm
+   Samples: 2742 - 3245 (504 samples)
+   Duration: 4.20 minutes (252.0 seconds)
+   Altitude Range: 8046 - 15816 feet
+   Altitude Change: 15816 → 8046 feet
+   Airspeed Range: 181 → 187 knots (max: 198 kts)
+   Average Vertical Speed: -1849 fpm
 
-9. CRUISE
-   Samples: 2757 - 2761 (5 samples)
-   Duration: 0.04 minutes (2.5 seconds)
-   Altitude Range: 15762 - 15768 feet
-   Altitude Change: 15762 → 15768 feet
-   Airspeed Range: 177 → 177 knots (max: 177 kts)
-   Average Vertical Speed: -257 fpm
-
-10. DESCENT
-   Samples: 2762 - 3245 (484 samples)
-   Duration: 4.03 minutes (242.0 seconds)
-   Altitude Range: 8045 - 15763 feet
-   Altitude Change: 15763 → 8045 feet
-   Airspeed Range: 177 → 188 knots (max: 198 kts)
-   Average Vertical Speed: -1910 fpm
-
-11. APPROACH
+9. APPROACH
    Samples: 3246 - 3405 (160 samples)
    Duration: 1.33 minutes (80.0 seconds)
-   Altitude Range: 6039 - 8027 feet
-   Altitude Change: 8027 → 6039 feet
-   Airspeed Range: 188 → 120 knots (max: 188 kts)
-   Average Vertical Speed: -1508 fpm
+   Altitude Range: 6038 - 8026 feet
+   Altitude Change: 8026 → 6038 feet
+   Airspeed Range: 187 → 120 knots (max: 187 kts)
+   Average Vertical Speed: -1509 fpm
 
-12. FINAL_APPROACH
+10. FINAL_APPROACH
    Samples: 3406 - 3529 (124 samples)
    Duration: 1.03 minutes (62.0 seconds)
-   Altitude Range: 5032 - 6030 feet
-   Altitude Change: 6030 → 5042 feet
+   Altitude Range: 5030 - 6026 feet
+   Altitude Change: 6026 → 5042 feet
    Airspeed Range: 120 → 31 knots (max: 122 kts)
-   Average Vertical Speed: -971 fpm
+   Average Vertical Speed: -970 fpm
 
-13. GROUND
+11. GROUND
    Samples: 3530 - 3724 (195 samples)
    Duration: 1.62 minutes (97.5 seconds)
-   Altitude Range: 5035 - 5046 feet
-   Altitude Change: 5041 → 5045 feet
+   Altitude Range: 5034 - 5046 feet
+   Altitude Change: 5040 → 5044 feet
    Airspeed Range: 0 → 0 knots (max: 0 kts)
    Average Vertical Speed: 2 fpm
 

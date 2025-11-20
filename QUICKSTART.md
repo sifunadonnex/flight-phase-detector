@@ -180,14 +180,24 @@ Each aircraft type has optimized thresholds:
 
 ## CSV File Format
 
-Your CSV should have these columns (minimum):
-- `AIRSPEED L` / `AIRSPEED R` - Left/right airspeed (knots)
-- `ALTITUDE L` / `ALTITUDE R` - Left/right altitude (feet)
-- `TQ 1` / `TQ 2` - Engine torque (%)
-- `AP ENGAGED` - Autopilot status
-- `ACCN NORM` / `ACCN LONG` / `ACCN LAT` - Accelerations (g)
+### Required Columns (Core Parameters)
+- `AIRSPEED L`, `AIRSPEED R` or `COMPUTED AIRSPEED`
+- `ALTITUDE L`, `ALTITUDE R` or `ALTITUDE`
+- `TQ 1`, `TQ 2` or engine parameters
+- `AP ENGAGED` or `G/S ENGAGE`
 
-See `5Y_TBX_Q400.csv` for example format.
+### Enhanced Parameters (For Maximum Accuracy)
+- `AIR/GROUND` - Direct ground/air status (highly recommended)
+- `T.E. FLAP POSN-RIGHT` - Flap position for approach phases
+- `SPEED BRK HDL POSN` - Speedbrake status for descent confirmation
+- `VERTICAL ACCELERATION` - Vertical acceleration data
+
+### Optional Parameters
+- `ACCN NORM`, `ACCN LONG`, `ACCN LAT` - Accelerations
+- `FLAPS`, `ALT FLAPS` - Alternative flap columns
+- `GROUNDSPEED` - Ground speed (fallback)
+
+See `5Y-JSK.csv` (Boeing 737) or `5Y_TBX_Q400.csv` (Bombardier Q400) for example formats.
 
 ## Common Issues
 

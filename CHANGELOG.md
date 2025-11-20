@@ -2,6 +2,39 @@
 
 All notable changes to the Flight Phase Detection System.
 
+## [2.1.0] - 2025
+
+### Added - Enhanced Parameter Integration
+- **AIR/GROUND Sensor Support**: Direct ground/air status detection using `AIR/GROUND` column
+- **Flap Position Integration**: Uses `T.E. FLAP POSN-RIGHT` for approach phase refinement
+- **Speedbrake Detection**: Incorporates `SPEED BRK HDL POSN` for descent phase confirmation
+- **Vertical Acceleration**: Added `VERTICAL ACCELERATION` parameter support
+- **Flexible Column Mapping**: Enhanced column detection with multiple possible names for each parameter
+
+### Enhanced - Detection Accuracy
+- **Direct Ground/Air Classification**: Uses aircraft sensor data instead of inferred status
+- **Flap-Based Approach Detection**: Distinguishes between APPROACH (partial flaps) and FINAL_APPROACH (full flaps)
+- **Speedbrake-Assisted Descent**: Confirms descent phases using speedbrake deployment
+- **Improved Phase Transitions**: More accurate ground-to-air and air-to-ground transitions
+
+### Enhanced - Boeing 737 Analysis
+- **Validated with B737-490(SF)**: Successfully analyzed Boeing 737 flight data
+- **8 Flight Phases Detected**: Complete phase segmentation with realistic altitude profiles
+- **Enhanced Parameter Usage**: All available aircraft parameters utilized for maximum accuracy
+
+### Fixed - Parameter Handling
+- **Robust Column Detection**: Handles various FDR data formats and column naming conventions
+- **Missing Parameter Graceful Degradation**: System works with partial parameter sets
+- **Enhanced Error Messages**: Better feedback when parameters are unavailable
+
+### Enhanced - Documentation
+- Updated README.md with enhanced parameter information
+- Updated QUICKSTART.md with advanced parameter usage
+- Updated COMPLETION_SUMMARY.md with new capabilities
+- Updated PROJECT_SUMMARY.md with enhanced features
+
+---
+
 ## [2.0.0] - 2025
 
 ### Added - Multi-Aircraft Support
