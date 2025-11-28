@@ -44,10 +44,11 @@ Uses a multi-parameter rule-based approach:
 #### Enhanced Detection Features (v2.1)
 
 - **AIR/GROUND Sensor**: Direct ground/air classification from aircraft sensors
+- **Weight on Wheels (WOW) Sensors**: Direct ground/air status for Q400 aircraft (ON=ground, OFF=airborne)
 - **Flap Position**: Refines approach phase detection (partial vs. full flaps)
 - **Speedbrake Status**: Confirms descent phases with speedbrake deployment
 - **Vertical Acceleration**: Enhances takeoff/landing detection
-- **Flexible Column Mapping**: Supports various FDR data formats
+- **Flexible Column Mapping**: Supports various FDR data formats and aircraft types
 
 #### Detection Thresholds (Configurable)
 
@@ -156,23 +157,33 @@ detector.generate_report('flight_report.txt')
 
 ## 📁 Input Format
 
-### Required Columns (Core Parameters)
-- `AIRSPEED L`, `AIRSPEED R` or `COMPUTED AIRSPEED`
-- `ALTITUDE L`, `ALTITUDE R` or `ALTITUDE`
-- `TQ 1`, `TQ 2` or engine parameters
-- `AP ENGAGED` or `G/S ENGAGE`
+### Core Required Parameters (Must be Present)
+- **Airspeed**: `AIRSPEED L`, `AIRSPEED R`, `AIRSPEED`, or `COMPUTED AIRSPEED`
+- **Altitude**: `ALTITUDE L`, `ALTITUDE R`, `ALTITUDE`, or `ELEVATION`
+- **Ground/Air Status**: `AIR/GROUND`, `AIR GROUND`, `GROUND/AIR`, `WOW MLG`, or `WOW NLG`
 
-### Enhanced Parameters (Recommended for Better Accuracy)
-- `AIR/GROUND` - Direct ground/air status from aircraft sensors
-- `T.E. FLAP POSN-RIGHT`, `T.E. FLAP POSN-LEFT` - Flap position for approach detection
-- `SPEED BRK HDL POSN` - Speedbrake status for descent confirmation
-- `VERTICAL ACCELERATION` - Vertical acceleration for takeoff/landing detection
+### Enhanced Parameters (Optional - Improve Accuracy)
+- **Flap Position**: `T.E. FLAP POSN-RIGHT`, `T.E. FLAP POSN-LEFT`, `FLAPS`, `ALT FLAPS`, or `FLAP POS`
+- **Speedbrake Status**: `SPEED BRK HDL POSN`, `SPOILER POSN NO. 7`, or `SPOILER POSN NO. 2`
+- **Vertical Acceleration**: `VERTICAL ACCELERATION` or `ACCN NORM`
 
-### Optional Parameters
-- `ACCN NORM`, `ACCN LONG`, `ACCN LAT` - Accelerations
-- `FLAPS`, `ALT FLAPS` - Alternative flap position columns
-- `GROUNDSPEED` - Ground speed (fallback for airspeed)
-- Time stamps (optional)
+### Additional Optional Parameters
+- **Engine Parameters**: `TQ 1`, `TQ 2`, `ENG 1`, `ENG 2`
+- **Autopilot Status**: `AP ENGAGED` or `G/S ENGAGE`
+- **Accelerations**: `ACCN NORM`, `ACCN LONG`, `ACCN LAT`
+- **Groundspeed**: `GROUNDSPEED` (fallback for airspeed)
+- **Time stamps**: Various formats supported
+
+### Aircraft-Specific Notes
+
+#### Q400 (Bombardier Dash 8)
+- **Preferred Ground/Air Sensor**: `WOW MLG` or `WOW NLG` (Weight on Wheels)
+- **Logic**: ON = on ground, OFF = airborne (opposite of AIR/GROUND sensors)
+- **Enhanced Parameters**: Flaps and vertical acceleration available in most FDR data
+
+#### Boeing/Airbus Jets
+- **Preferred Ground/Air Sensor**: `AIR/GROUND` (AIR = airborne, GROUND = on ground)
+- **Enhanced Parameters**: All optional parameters typically available
 
 ---
 
@@ -219,11 +230,29 @@ detector.generate_report('flight_report.txt')
 - Memory: ~50MB for 10,000 samples  
 - Accuracy: **>98% with enhanced parameters** (validated with AIR/GROUND, flaps, speedbrakes)
 - **Boeing 737-490(SF) Tested**: 8 phases detected, 51 minutes flight time
-- **Bombardier Q400 Tested**: 11 phases detected, 31 minutes flight time
+- **Bombardier Q400 Tested**: 16 phases detected, 49 minutes flight time (WOW MLG sensor integration)
+- **Backward Compatibility**: Works with basic FDR data (airspeed + altitude only)
 
 ---
 
-## 🔮 Future Enhancements
+## 🔄 Recent Updates (v2.1)
+
+### Enhanced Parameter Handling
+- **Core vs Optional Parameters**: Separated required core parameters from optional enhanced parameters
+- **Backward Compatibility**: System works with basic FDR data (airspeed + altitude only)
+- **Flexible Sensor Support**: Supports both AIR/GROUND and Weight on Wheels (WOW) sensors
+
+### Q400 Aircraft Support
+- **WOW MLG/NLG Integration**: Direct ground/air status using Weight on Wheels sensors
+- **Sensor Polarity Handling**: Correctly interprets ON=ground, OFF=airborne for WOW sensors
+- **Validated Testing**: Successfully tested with real Q400 FDR data (16 phases detected)
+
+### Improved Detection Logic
+- **Optional Enhanced Parameters**: Flaps, speedbrakes, and vertical acceleration are now optional
+- **Better Error Handling**: Graceful degradation when enhanced parameters are unavailable
+- **Aircraft-Specific Logic**: Different sensor types handled appropriately per aircraft
+
+---
 
 - [ ] ML-based detection  
 - [ ] Real-time support  

@@ -290,12 +290,16 @@ class FlightPhaseDetector:
         # Clean up column names (remove leading/trailing spaces)
         self.df.columns = self.df.columns.str.strip()
 
-        # Validate required columns - try multiple possible column names
-        required_mappings = {
+        # Core required mappings (must be present)
+        core_required_mappings = {
             'airspeed': ['AIRSPEED  L', 'AIRSPEED R', 'AIRSPEED', 'COMPUTED AIRSPEED'],
             'altitude': ['ALTITUDE L', 'ALTITUDE R', 'ALTITUDE', 'ELEVATION'],
-            'air_ground': ['AIR/GROUND', 'AIR GROUND', 'GROUND/AIR'],
-            'flaps': ['T.E. FLAP POSN-RIGHT', 'T.E. FLAP POSN-LEFT', 'FLAPS', 'ALT FLAPS'],
+            'air_ground': ['AIR/GROUND', 'AIR GROUND', 'GROUND/AIR', 'WOW MLG', 'WOW NLG'],
+        }
+
+        # Optional enhanced mappings (improve accuracy but not required)
+        optional_mappings = {
+            'flaps': ['T.E. FLAP POSN-RIGHT', 'T.E. FLAP POSN-LEFT', 'FLAPS', 'ALT FLAPS', 'FLAP POS'],
             'speedbrake': ['SPEED BRK HDL POSN', 'SPOILER POSN NO. 7', 'SPOILER POSN NO. 2'],
             'vertical_accel': ['VERTICAL ACCELERATION', 'ACCN NORM'],
         }
@@ -305,9 +309,10 @@ class FlightPhaseDetector:
 
         # Map column names to standard names
         self.column_mapping = {}
-        missing_columns = []
+        missing_core_columns = []
 
-        for standard_name, possible_names in required_mappings.items():
+        # Check core required columns first
+        for standard_name, possible_names in core_required_mappings.items():
             found = False
             for possible_name in possible_names:
                 if possible_name in available_columns:
@@ -315,11 +320,22 @@ class FlightPhaseDetector:
                     found = True
                     break
             if not found:
-                missing_columns.append(f"{standard_name} (tried: {', '.join(possible_names)})")
+                missing_core_columns.append(f"{standard_name} (tried: {', '.join(possible_names)})")
 
-        if missing_columns:
-            raise ValueError(f"Missing required columns: {missing_columns}\n"
+        if missing_core_columns:
+            raise ValueError(f"Missing required core columns: {missing_core_columns}\n"
                            f"Available columns include: {sorted(list(available_columns))[:10]}...")
+
+        # Check optional enhanced columns
+        for standard_name, possible_names in optional_mappings.items():
+            found = False
+            for possible_name in possible_names:
+                if possible_name in available_columns:
+                    self.column_mapping[standard_name] = possible_name
+                    found = True
+                    break
+            if not found:
+                self.column_mapping[standard_name] = None  # Mark as not available
 
         print(f"Column mapping: {self.column_mapping}")
 
@@ -368,13 +384,19 @@ class FlightPhaseDetector:
         # Process AIR/GROUND status
         air_ground_col = self.column_mapping.get('air_ground')
         if air_ground_col and air_ground_col in self.df.columns:
-            # Convert to boolean: True = AIR, False = GROUND
-            self.df['IS_AIRBORNE'] = self.df[air_ground_col].str.upper() == 'AIR'
-            print(f"Using AIR/GROUND data from column: {air_ground_col}")
+            # Handle different sensor types
+            if air_ground_col in ['WOW MLG', 'WOW NLG']:
+                # Weight on Wheels: ON = on ground, OFF = airborne
+                self.df['IS_AIRBORNE'] = self.df[air_ground_col].str.upper() == 'OFF'
+                print(f"Using Weight on Wheels data from column: {air_ground_col} (ON=ground, OFF=airborne)")
+            else:
+                # AIR/GROUND sensor: AIR = airborne, GROUND = on ground
+                self.df['IS_AIRBORNE'] = self.df[air_ground_col].str.upper() == 'AIR'
+                print(f"Using AIR/GROUND data from column: {air_ground_col}")
         else:
             # No AIR/GROUND data, infer from other parameters
             self.df['IS_AIRBORNE'] = False  # Will be set in phase classification
-            print("Warning: No AIR/GROUND data available, will infer from other parameters")
+            print("Warning: No AIR/GROUND or WOW data available, will infer from other parameters")
 
         # Process flap position
         flaps_col = self.column_mapping.get('flaps')
@@ -383,7 +405,7 @@ class FlightPhaseDetector:
             print(f"Using flaps data from column: {flaps_col}")
         else:
             self.df['FLAPS_AVG'] = 0
-            print("Warning: No flaps data available")
+            print("Warning: No flaps data available (optional parameter)")
 
         # Process speedbrake/spoiler position
         speedbrake_col = self.column_mapping.get('speedbrake')
@@ -392,7 +414,7 @@ class FlightPhaseDetector:
             print(f"Using speedbrake data from column: {speedbrake_col}")
         else:
             self.df['SPEEDBRAKE_DEPLOYED'] = False
-            print("Warning: No speedbrake data available")
+            print("Warning: No speedbrake data available (optional parameter)")
 
         # Process vertical acceleration
         vert_accel_col = self.column_mapping.get('vertical_accel')
@@ -401,7 +423,7 @@ class FlightPhaseDetector:
             print(f"Using vertical acceleration from column: {vert_accel_col}")
         else:
             self.df['VERTICAL_ACCEL'] = 1.0
-            print("Warning: No vertical acceleration data available")
+            print("Warning: No vertical acceleration data available (optional parameter)")
 
         # Average engine torque (handle potential column name variations)
         torque_cols = ['TQ 1', 'TQ 2', 'TQ 1 ', 'TQ 2 ', 'ENG 1', 'ENG 2']
