@@ -37,6 +37,7 @@ Specify the aircraft type for optimized detection:
 # Regional turboprops
 python flight_phase_detector.py flight.csv Q400
 python flight_phase_detector.py flight.csv ATR72
+python flight_phase_detector.py flight.csv CARAVAN
 
 # Narrow-body jets
 python flight_phase_detector.py flight.csv B737
@@ -55,6 +56,7 @@ python flight_phase_detector.py flight.csv GENERIC_JET
 |------|----------|----------|
 | `Q400` | Bombardier Q400 | Regional Turboprop (default) |
 | `ATR72` | ATR 72 | Regional Turboprop |
+| `CARAVAN` | Cessna 208 Caravan | Utility Turboprop |
 | `B737` | Boeing 737 | Narrow-Body Jet |
 | `A320` | Airbus A320 | Narrow-Body Jet |
 | `B777` | Boeing 777 | Wide-Body Jet |

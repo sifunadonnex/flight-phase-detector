@@ -79,6 +79,20 @@ AIRCRAFT_PROFILES = {
         'typical_cruise_alt': 22000,
         'typical_cruise_speed': 300,
     },
+    'CARAVAN': {
+        'name': 'Cessna 208 Caravan (Single-Engine Turboprop)',
+        'taxi_speed': 20,
+        'takeoff_speed': 55,
+        'rotation_speed': 70,
+        'climb_rate': 300,
+        'descent_rate': -300,
+        'cruise_vs_threshold': 150,
+        'approach_altitude': 2500,
+        'initial_climb_alt': 1200,
+        'landing_altitude': 300,
+        'typical_cruise_alt': 12000,
+        'typical_cruise_speed': 140,
+    },
     'B737': {
         'name': 'Boeing 737 (Narrow-body Jet)',
         'taxi_speed': 30,
@@ -222,6 +236,7 @@ class FlightPhaseDetector:
         Available Aircraft Types:
             - Q400: Bombardier Q400 (Regional Turboprop)
             - ATR72: ATR 72 (Regional Turboprop)
+            - CARAVAN: Cessna 208 Caravan (Single-Engine Turboprop)
             - B737: Boeing 737 (Narrow-body Jet)
             - A320: Airbus A320 (Narrow-body Jet)
             - B777: Boeing 777 (Wide-body Jet)
@@ -256,6 +271,9 @@ class FlightPhaseDetector:
             'min_cruise_duration': 30,       # Min samples for cruise phase
             'final_approach_alt': 1000,      # Altitude for final approach
             'landing_rollout_alt': 100,      # Altitude for landing rollout
+            'inferred_airborne_speed': 45,   # Airspeed threshold when AIR/GROUND unavailable
+            'inferred_airborne_vs': 300,     # Vertical speed threshold when AIR/GROUND unavailable
+            'inferred_airborne_agl': 150,    # Altitude AGL threshold when AIR/GROUND unavailable
         })
 
         # Remove documentation fields
@@ -292,16 +310,18 @@ class FlightPhaseDetector:
 
         # Core required mappings (must be present)
         core_required_mappings = {
-            'airspeed': ['AIRSPEED  L', 'AIRSPEED R', 'AIRSPEED', 'COMPUTED AIRSPEED'],
-            'altitude': ['ALTITUDE L', 'ALTITUDE R', 'ALTITUDE', 'ELEVATION'],
-            'air_ground': ['AIR/GROUND', 'AIR GROUND', 'GROUND/AIR', 'WOW MLG', 'WOW NLG'],
+            'airspeed': ['AIRSPEED  L', 'AIRSPEED R', 'AIRSPEED', 'COMPUTED AIRSPEED', 'IAS', 'GndSpd', 'GROUNDSPEED'],
+            'altitude': ['ALTITUDE L', 'ALTITUDE R', 'ALTITUDE', 'ELEVATION', 'AltMSL', 'AltB'],
         }
 
         # Optional enhanced mappings (improve accuracy but not required)
         optional_mappings = {
+            'air_ground': ['AIR/GROUND', 'AIR GROUND', 'GROUND/AIR', 'WOW MLG', 'WOW NLG'],
             'flaps': ['T.E. FLAP POSN-RIGHT', 'T.E. FLAP POSN-LEFT', 'FLAPS', 'ALT FLAPS', 'FLAP POS'],
             'speedbrake': ['SPEED BRK HDL POSN', 'SPOILER POSN NO. 7', 'SPOILER POSN NO. 2'],
             'vertical_accel': ['VERTICAL ACCELERATION', 'ACCN NORM'],
+            'vertical_speed': ['VERTICAL SPEED', 'VSpd'],
+            'autopilot': ['AP ENGAGED', 'G/S ENGAGE', 'AfcsOn'],
         }
 
         # Find available columns
@@ -363,11 +383,11 @@ class FlightPhaseDetector:
         # Average airspeed from available sensors
         airspeed_col = self.column_mapping.get('airspeed', 'COMPUTED AIRSPEED')
         if airspeed_col in self.df.columns:
-            self.df['AIRSPEED_AVG'] = self.df[airspeed_col]
+            self.df['AIRSPEED_AVG'] = pd.to_numeric(self.df[airspeed_col], errors='coerce').fillna(0)
         else:
             # If no airspeed column, try to use groundspeed or set to 0
             if 'GROUNDSPEED' in self.df.columns:
-                self.df['AIRSPEED_AVG'] = self.df['GROUNDSPEED']
+                self.df['AIRSPEED_AVG'] = pd.to_numeric(self.df['GROUNDSPEED'], errors='coerce').fillna(0)
                 print("Warning: Using GROUNDSPEED as airspeed")
             else:
                 self.df['AIRSPEED_AVG'] = 0
@@ -376,27 +396,10 @@ class FlightPhaseDetector:
         # Average altitude from available sensors
         altitude_col = self.column_mapping.get('altitude', 'ELEVATION')
         if altitude_col in self.df.columns:
-            self.df['ALTITUDE_AVG'] = self.df[altitude_col]
+            self.df['ALTITUDE_AVG'] = pd.to_numeric(self.df[altitude_col], errors='coerce').ffill().fillna(0)
         else:
             self.df['ALTITUDE_AVG'] = 0
             print("Warning: No altitude data available, setting to 0")
-
-        # Process AIR/GROUND status
-        air_ground_col = self.column_mapping.get('air_ground')
-        if air_ground_col and air_ground_col in self.df.columns:
-            # Handle different sensor types
-            if air_ground_col in ['WOW MLG', 'WOW NLG']:
-                # Weight on Wheels: ON = on ground, OFF = airborne
-                self.df['IS_AIRBORNE'] = self.df[air_ground_col].str.upper() == 'OFF'
-                print(f"Using Weight on Wheels data from column: {air_ground_col} (ON=ground, OFF=airborne)")
-            else:
-                # AIR/GROUND sensor: AIR = airborne, GROUND = on ground
-                self.df['IS_AIRBORNE'] = self.df[air_ground_col].str.upper() == 'AIR'
-                print(f"Using AIR/GROUND data from column: {air_ground_col}")
-        else:
-            # No AIR/GROUND data, infer from other parameters
-            self.df['IS_AIRBORNE'] = False  # Will be set in phase classification
-            print("Warning: No AIR/GROUND or WOW data available, will infer from other parameters")
 
         # Process flap position
         flaps_col = self.column_mapping.get('flaps')
@@ -426,35 +429,44 @@ class FlightPhaseDetector:
             print("Warning: No vertical acceleration data available (optional parameter)")
 
         # Average engine torque (handle potential column name variations)
-        torque_cols = ['TQ 1', 'TQ 2', 'TQ 1 ', 'TQ 2 ', 'ENG 1', 'ENG 2']
+        torque_cols = ['TQ 1', 'TQ 2', 'TQ 1 ', 'TQ 2 ', 'ENG 1', 'ENG 2', 'E1 Torq', 'E2 Torq']
         available_torque = [col for col in torque_cols if col in self.df.columns]
 
         if len(available_torque) >= 2:
-            self.df['TQ_AVG'] = self.df[available_torque[:2]].mean(axis=1)
+            self.df['TQ_AVG'] = self.df[available_torque[:2]].apply(pd.to_numeric, errors='coerce').mean(axis=1)
         elif len(available_torque) == 1:
-            self.df['TQ_AVG'] = self.df[available_torque[0]]
+            self.df['TQ_AVG'] = pd.to_numeric(self.df[available_torque[0]], errors='coerce').fillna(0)
         else:
             # No torque data, use 0 or try to infer from other columns
             self.df['TQ_AVG'] = 50  # Assume moderate power setting
             print("Warning: No torque/thrust data available, using default value")
 
-        # Calculate vertical speed (feet per minute)
-        # Assuming data is sampled at approximately 2 Hz (2 samples per second)
-        time_diff = 0.5  # seconds between samples
-        self.df['VERTICAL_SPEED'] = self.df['ALTITUDE_AVG'].diff() / time_diff * 60
+        # Calculate or map vertical speed (feet per minute)
+        vertical_speed_col = self.column_mapping.get('vertical_speed')
+        if vertical_speed_col and vertical_speed_col in self.df.columns:
+            self.df['VERTICAL_SPEED'] = pd.to_numeric(self.df[vertical_speed_col], errors='coerce').fillna(0)
+            print(f"Using vertical speed data from column: {vertical_speed_col}")
+        else:
+            # Assuming data is sampled at approximately 2 Hz (2 samples per second)
+            time_diff = 0.5  # seconds between samples
+            self.df['VERTICAL_SPEED'] = self.df['ALTITUDE_AVG'].diff() / time_diff * 60
 
         # Smooth vertical speed to reduce noise
         window_size = 10
         self.df['VERTICAL_SPEED_SMOOTH'] = self.df['VERTICAL_SPEED'].rolling(
             window=window_size, center=True
-        ).mean()
+        ).mean().fillna(self.df['VERTICAL_SPEED'])
 
         # Calculate acceleration (g's change per sample)
-        accel_cols = ['ACCN NORM', 'LONGITUDINAL ACCEL']
+        accel_cols = ['ACCN NORM', 'LONGITUDINAL ACCEL', 'NormAc', 'LatAc']
         if 'ACCN NORM' in self.df.columns:
-            self.df['ACCEL_NORM_DIFF'] = self.df['ACCN NORM'].diff()
+            self.df['ACCEL_NORM_DIFF'] = pd.to_numeric(self.df['ACCN NORM'], errors='coerce').diff()
         elif 'LONGITUDINAL ACCEL' in self.df.columns:
-            self.df['ACCEL_NORM_DIFF'] = self.df['LONGITUDINAL ACCEL'].diff()
+            self.df['ACCEL_NORM_DIFF'] = pd.to_numeric(self.df['LONGITUDINAL ACCEL'], errors='coerce').diff()
+        elif 'NormAc' in self.df.columns:
+            self.df['ACCEL_NORM_DIFF'] = pd.to_numeric(self.df['NormAc'], errors='coerce').diff()
+        elif 'LatAc' in self.df.columns:
+            self.df['ACCEL_NORM_DIFF'] = pd.to_numeric(self.df['LatAc'], errors='coerce').diff()
         else:
             self.df['ACCEL_NORM_DIFF'] = 0
             print("Warning: No acceleration data available")
@@ -485,6 +497,30 @@ class FlightPhaseDetector:
                     # If we're close to destination altitude, use it as reference
                     if current_alt < (destination_altitude + 3000):
                         self.df.at[idx, 'ALTITUDE_AGL'] = current_alt - destination_altitude
+
+        # Process AIR/GROUND status (or infer if unavailable)
+        air_ground_col = self.column_mapping.get('air_ground')
+        if air_ground_col and air_ground_col in self.df.columns:
+            sensor_values = self.df[air_ground_col].astype(str).str.strip().str.upper()
+            # Handle different sensor types
+            if air_ground_col in ['WOW MLG', 'WOW NLG']:
+                # Weight on Wheels: ON = on ground, OFF = airborne
+                self.df['IS_AIRBORNE'] = sensor_values.isin(['OFF', 'AIR', 'FALSE', '0'])
+                print(f"Using Weight on Wheels data from column: {air_ground_col} (ON=ground, OFF=airborne)")
+            else:
+                # AIR/GROUND sensor: AIR = airborne, GROUND = on ground
+                self.df['IS_AIRBORNE'] = sensor_values.isin(['AIR', 'IN AIR', 'TRUE', '1'])
+                print(f"Using AIR/GROUND data from column: {air_ground_col}")
+        else:
+            airborne_speed = self.THRESHOLDS.get('inferred_airborne_speed', 45)
+            airborne_vs = self.THRESHOLDS.get('inferred_airborne_vs', 300)
+            airborne_agl = self.THRESHOLDS.get('inferred_airborne_agl', 150)
+            self.df['IS_AIRBORNE'] = (
+                (self.df['AIRSPEED_AVG'] >= airborne_speed) |
+                (self.df['VERTICAL_SPEED_SMOOTH'].abs() >= airborne_vs) |
+                (self.df['ALTITUDE_AGL'] >= airborne_agl)
+            )
+            print("Warning: No AIR/GROUND or WOW data available, using inferred air/ground state")
 
         print(f"Ground altitude estimated at: {self.ground_altitude:.0f} feet MSL")
         if abs(self.altitude_change) > 1000:
@@ -554,9 +590,11 @@ class FlightPhaseDetector:
         # Handle autopilot engagement (try multiple possible column names)
         ap_engaged = False
         if 'AP ENGAGED' in self.df.columns:
-            ap_engaged = row['AP ENGAGED'] == 'ENGAGED'
+            ap_engaged = str(row['AP ENGAGED']).strip().upper() == 'ENGAGED'
         elif 'G/S ENGAGE' in self.df.columns:
-            ap_engaged = row['G/S ENGAGE'] == 'ENGAGED'
+            ap_engaged = str(row['G/S ENGAGE']).strip().upper() == 'ENGAGED'
+        elif 'AfcsOn' in self.df.columns:
+            ap_engaged = str(row['AfcsOn']).strip().upper() not in ['', '0', 'FALSE', 'NONE', 'OFF']
 
         torque = row['TQ_AVG']
 
@@ -589,6 +627,12 @@ class FlightPhaseDetector:
                         return 'TAXI-OUT'
             else:
                 # Aircraft is airborne - determine air phase
+                if (not has_flown and
+                    altitude_agl < self.THRESHOLDS['landing_altitude'] and
+                    airspeed >= self.THRESHOLDS['takeoff_speed'] and
+                    airspeed < self.THRESHOLDS['rotation_speed'] + 20):
+                    return 'TAKEOFF'
+
                 if vs > self.THRESHOLDS['climb_rate']:
                     if altitude_agl < self.THRESHOLDS['initial_climb_alt']:
                         return 'INITIAL_CLIMB'
@@ -614,8 +658,11 @@ class FlightPhaseDetector:
                     if altitude_agl > self.THRESHOLDS['approach_altitude']:
                         return 'CRUISE'
                     else:
-                        # Low altitude level flight with flaps likely indicates approach
-                        if flaps > 5:
+                        # Low-altitude level segments are often part of approach in datasets
+                        # without flap sensors (e.g., Caravan logs).
+                        if (flaps > 5 or
+                            (has_flown and altitude_agl < self.THRESHOLDS['approach_altitude'] and
+                             (vs < 0 or airspeed <= self.THRESHOLDS['rotation_speed'] + 20))):
                             return 'APPROACH'
                         else:
                             return 'CRUISE'
@@ -702,6 +749,53 @@ class FlightPhaseDetector:
                 if start_idx > 0:
                     prev_phase = self.df.iloc[start_idx - 1]['PHASE']
                     self.df.loc[start_idx:end_idx-1, 'PHASE'] = prev_phase
+
+        # Context-aware merge for short CRUISE islands that often appear
+        # in transition regions (e.g., approach/descent and initial climb/climb).
+        phase_changes = self.df['PHASE'] != self.df['PHASE'].shift()
+        phase_starts = self.df.index[phase_changes].tolist()
+
+        segments = []
+        for i, start_idx in enumerate(phase_starts):
+            end_idx = phase_starts[i + 1] - 1 if i + 1 < len(phase_starts) else len(self.df) - 1
+            segments.append((start_idx, end_idx, self.df.iloc[start_idx]['PHASE']))
+
+        cruise_patch_max = 90  # 45 seconds at 2 Hz
+        approach_like = {'APPROACH', 'FINAL_APPROACH', 'DESCENT'}
+        climb_like = {'INITIAL_CLIMB', 'CLIMB'}
+
+        for i in range(1, len(segments) - 1):
+            start_idx, end_idx, phase = segments[i]
+            duration = end_idx - start_idx + 1
+
+            if phase != 'CRUISE' or duration > cruise_patch_max:
+                continue
+
+            prev_phase = segments[i - 1][2]
+            next_phase = segments[i + 1][2]
+            median_agl = self.df.loc[start_idx:end_idx, 'ALTITUDE_AGL'].median()
+
+            replacement_phase = None
+
+            # Cruise patches inside descent/approach chains should remain approach-like.
+            if prev_phase in approach_like and next_phase in approach_like:
+                replacement_phase = 'APPROACH' if ('APPROACH' in (prev_phase, next_phase) or
+                                                  'FINAL_APPROACH' in (prev_phase, next_phase)) else 'DESCENT'
+
+            # Cruise patches between climb segments should remain climb-like.
+            elif prev_phase in climb_like and next_phase in climb_like:
+                if median_agl < self.THRESHOLDS['initial_climb_alt']:
+                    replacement_phase = 'INITIAL_CLIMB'
+                else:
+                    replacement_phase = 'CLIMB'
+
+            # Extra guard for low-altitude cruise islands near approach.
+            elif (median_agl < self.THRESHOLDS['approach_altitude'] and
+                  (prev_phase in approach_like or next_phase in approach_like)):
+                replacement_phase = 'APPROACH'
+
+            if replacement_phase:
+                self.df.loc[start_idx:end_idx, 'PHASE'] = replacement_phase
 
     def _extract_phase_segments(self):
         """Extract contiguous phase segments with start/end times and statistics."""

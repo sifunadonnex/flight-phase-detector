@@ -131,6 +131,7 @@ python flight_phase_detector.py flight_data.csv B737
 |------|----------|----------|------------------------|-------|
 | Q400 | Bombardier Q400 | Turboprop | 25,000 ft / 360 kts | Default |
 | ATR72 | ATR 72 | Turboprop | 22,000 ft / 300 kts | Lower speeds |
+| CARAVAN | Cessna 208 Caravan | Turboprop | 12,000 ft / 140 kts | Single-engine utility turboprop |
 | B737 | Boeing 737 | Jet | 37,000 ft / 450 kts | Common jet |
 | A320 | Airbus A320 | Jet | 37,000 ft / 450 kts | Similar to B737 |
 | B777 | Boeing 777 | Jet | 39,000 ft / 490 kts | Long-haul |
@@ -158,9 +159,9 @@ detector.generate_report('flight_report.txt')
 ## 📁 Input Format
 
 ### Core Required Parameters (Must be Present)
-- **Airspeed**: `AIRSPEED L`, `AIRSPEED R`, `AIRSPEED`, or `COMPUTED AIRSPEED`
-- **Altitude**: `ALTITUDE L`, `ALTITUDE R`, `ALTITUDE`, or `ELEVATION`
-- **Ground/Air Status**: `AIR/GROUND`, `AIR GROUND`, `GROUND/AIR`, `WOW MLG`, or `WOW NLG`
+- **Airspeed**: `AIRSPEED L`, `AIRSPEED R`, `AIRSPEED`, `COMPUTED AIRSPEED`, `IAS`, or `GndSpd`
+- **Altitude**: `ALTITUDE L`, `ALTITUDE R`, `ALTITUDE`, `ELEVATION`, `AltMSL`, or `AltB`
+- **Ground/Air Status**: Optional. If unavailable, the detector infers airborne state from speed, vertical speed, and altitude AGL.
 
 ### Enhanced Parameters (Optional - Improve Accuracy)
 - **Flap Position**: `T.E. FLAP POSN-RIGHT`, `T.E. FLAP POSN-LEFT`, `FLAPS`, `ALT FLAPS`, or `FLAP POS`
@@ -168,8 +169,9 @@ detector.generate_report('flight_report.txt')
 - **Vertical Acceleration**: `VERTICAL ACCELERATION` or `ACCN NORM`
 
 ### Additional Optional Parameters
-- **Engine Parameters**: `TQ 1`, `TQ 2`, `ENG 1`, `ENG 2`
-- **Autopilot Status**: `AP ENGAGED` or `G/S ENGAGE`
+- **Engine Parameters**: `TQ 1`, `TQ 2`, `ENG 1`, `ENG 2`, or `E1 Torq`
+- **Autopilot Status**: `AP ENGAGED`, `G/S ENGAGE`, or `AfcsOn`
+- **Vertical Speed**: `VERTICAL SPEED` or `VSpd` (used directly when available)
 - **Accelerations**: `ACCN NORM`, `ACCN LONG`, `ACCN LAT`
 - **Groundspeed**: `GROUNDSPEED` (fallback for airspeed)
 - **Time stamps**: Various formats supported
@@ -184,6 +186,11 @@ detector.generate_report('flight_report.txt')
 #### Boeing/Airbus Jets
 - **Preferred Ground/Air Sensor**: `AIR/GROUND` (AIR = airborne, GROUND = on ground)
 - **Enhanced Parameters**: All optional parameters typically available
+
+#### Cessna 208 Caravan
+- **Recommended Aircraft Type**: `CARAVAN`
+- **Common Columns**: `IAS`, `AltMSL`, `VSpd`, `E1 Torq`, `AfcsOn`
+- **Ground/Air Handling**: If no AIR/GROUND or WOW sensor exists, the system infers airborne state automatically.
 
 ---
 

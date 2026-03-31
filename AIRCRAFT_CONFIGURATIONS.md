@@ -13,6 +13,7 @@ The Flight Phase Detection System supports multiple aircraft types with predefin
 python flight_phase_detector.py flight_data.csv B737
 python flight_phase_detector.py flight_data.csv A320
 python flight_phase_detector.py flight_data.csv Q400
+python flight_phase_detector.py flight_data.csv CARAVAN
 ```
 
 ### Python API
@@ -76,6 +77,28 @@ detector = FlightPhaseDetector('flight.csv', 'A320', custom_thresholds=custom)
 - Fuel-efficient turboprop
 - Lower speeds than Q400
 - Ideal for thin routes
+
+#### Cessna 208 Caravan
+**Code**: `CARAVAN`
+
+| Parameter | Value | Unit | Description |
+|-----------|-------|------|-------------|
+| Taxi Speed | 20 | knots | Maximum speed for taxi phase |
+| Takeoff Speed | 55 | knots | Speed indicating takeoff roll |
+| Rotation Speed | 70 | knots | Typical rotation speed (Vr) |
+| Climb Rate | 300 | fpm | Minimum vertical speed for climb |
+| Descent Rate | -300 | fpm | Maximum vertical speed for descent |
+| Cruise VS Threshold | 150 | fpm | Max vertical speed variation in cruise |
+| Approach Altitude | 2500 | ft AGL | Altitude threshold for approach |
+| Initial Climb Alt | 1200 | ft AGL | Threshold for initial climb |
+| Landing Altitude | 300 | ft AGL | Altitude variation for landing |
+| **Typical Cruise Alt** | 12,000 | ft | Reference cruise altitude |
+| **Typical Cruise Speed** | 140 | knots | Reference cruise speed |
+
+**Notes**:
+- Single-engine turboprop utility aircraft
+- Typical GNSS logger columns: `IAS`, `AltMSL`, `VSpd`, `E1 Torq`, `AfcsOn`
+- AIR/GROUND sensor is optional; state can be inferred from speed, vertical speed, and AGL altitude
 
 ---
 
