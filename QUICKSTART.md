@@ -44,6 +44,7 @@ python flight_phase_detector.py flight.csv B737
 python flight_phase_detector.py flight.csv A320
 
 # Wide-body jets
+python flight_phase_detector.py flight.csv B767
 python flight_phase_detector.py flight.csv B777
 
 # Generic profiles (when aircraft type unknown)
@@ -59,6 +60,7 @@ python flight_phase_detector.py flight.csv GENERIC_JET
 | `CARAVAN` | Cessna 208 Caravan | Utility Turboprop |
 | `B737` | Boeing 737 | Narrow-Body Jet |
 | `A320` | Airbus A320 | Narrow-Body Jet |
+| `B767` | Boeing 767 | Wide-Body Jet |
 | `B777` | Boeing 777 | Wide-Body Jet |
 | `GENERIC_TURBOPROP` | Generic Turboprop | Generic |
 | `GENERIC_JET` | Generic Jet | Generic |

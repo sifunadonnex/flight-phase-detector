@@ -121,6 +121,20 @@ AIRCRAFT_PROFILES = {
         'typical_cruise_alt': 37000,
         'typical_cruise_speed': 450,
     },
+    'B767': {
+        'name': 'Boeing 767 (Wide-body Jet)',
+        'taxi_speed': 30,
+        'takeoff_speed': 110,
+        'rotation_speed': 150,
+        'climb_rate': 900,
+        'descent_rate': -700,
+        'cruise_vs_threshold': 250,
+        'approach_altitude': 3000,
+        'initial_climb_alt': 1500,
+        'landing_altitude': 500,
+        'typical_cruise_alt': 38000,
+        'typical_cruise_speed': 470,
+    },
     'B777': {
         'name': 'Boeing 777 (Wide-body Jet)',
         'taxi_speed': 35,
@@ -240,6 +254,7 @@ class FlightPhaseDetector:
             - B737: Boeing 737 (Narrow-body Jet)
             - A320: Airbus A320 (Narrow-body Jet)
             - B777: Boeing 777 (Wide-body Jet)
+            - B767: Boeing 767 (Wide-body Jet)
             - GENERIC_TURBOPROP: Generic turboprop configuration
             - GENERIC_JET: Generic jet configuration
 
@@ -310,17 +325,16 @@ class FlightPhaseDetector:
 
         # Core required mappings (must be present)
         core_required_mappings = {
-            'airspeed': ['AIRSPEED  L', 'AIRSPEED R', 'AIRSPEED', 'COMPUTED AIRSPEED', 'IAS', 'GndSpd', 'GROUNDSPEED'],
-            'altitude': ['ALTITUDE L', 'ALTITUDE R', 'ALTITUDE', 'ELEVATION', 'AltMSL', 'AltB'],
+            'airspeed': ['AIRSPEED  L', 'AIRSPEED R', 'AIRSPEED', 'COMPUTED AIRSPEED', 'Computed airspeed', 'IAS', 'GndSpd', 'GROUNDSPEED'],
+            'altitude': ['ALTITUDE L', 'ALTITUDE R', 'ALTITUDE', 'ELEVATION', 'AltMSL', 'AltB', 'Altitude (29.92)'],
         }
 
         # Optional enhanced mappings (improve accuracy but not required)
         optional_mappings = {
-            'air_ground': ['AIR/GROUND', 'AIR GROUND', 'GROUND/AIR', 'WOW MLG', 'WOW NLG'],
+            'air_ground': ['AIR/GROUND', 'Air / Ground', 'WOW', 'WEIGHT ON WHEELS'],
             'flaps': ['T.E. FLAP POSN-RIGHT', 'T.E. FLAP POSN-LEFT', 'FLAPS', 'ALT FLAPS', 'FLAP POS'],
             'speedbrake': ['SPEED BRK HDL POSN', 'SPOILER POSN NO. 7', 'SPOILER POSN NO. 2'],
-            'vertical_accel': ['VERTICAL ACCELERATION', 'ACCN NORM'],
-            'vertical_speed': ['VERTICAL SPEED', 'VSpd'],
+            'vertical_speed': ['VERTICAL SPEED', 'VSpd', 'V/S'],
             'autopilot': ['AP ENGAGED', 'G/S ENGAGE', 'AfcsOn'],
         }
 

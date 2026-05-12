@@ -134,6 +134,7 @@ python flight_phase_detector.py flight_data.csv B737
 | CARAVAN | Cessna 208 Caravan | Turboprop | 12,000 ft / 140 kts | Single-engine utility turboprop |
 | B737 | Boeing 737 | Jet | 37,000 ft / 450 kts | Common jet |
 | A320 | Airbus A320 | Jet | 37,000 ft / 450 kts | Similar to B737 |
+| B767 | Boeing 767 | Jet | 38,000 ft / 470 kts | Long-haul |
 | B777 | Boeing 777 | Jet | 39,000 ft / 490 kts | Long-haul |
 | GENERIC_TURBOPROP | Generic | Turboprop | 25,000 ft / 360 kts | Unknown type |
 | GENERIC_JET | Generic | Jet | 37,000 ft / 450 kts | Unknown type |

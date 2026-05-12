@@ -154,6 +154,28 @@ detector = FlightPhaseDetector('flight.csv', 'A320', custom_thresholds=custom)
 
 ### Wide-Body Jets
 
+#### Boeing 767
+**Code**: `B767`
+
+| Parameter | Value | Unit | Description |
+|-----------|-------|------|-------------|
+| Taxi Speed | 30 | knots | Maximum speed for taxi phase |
+| Takeoff Speed | 110 | knots | Speed indicating takeoff roll |
+| Rotation Speed | 150 | knots | Typical rotation speed (Vr) |
+| Climb Rate | 900 | fpm | Minimum vertical speed for climb |
+| Descent Rate | -700 | fpm | Maximum vertical speed for descent |
+| Cruise VS Threshold | 250 | fpm | Max vertical speed variation in cruise |
+| Approach Altitude | 3000 | ft AGL | Altitude threshold for approach phase |
+| Initial Climb Alt | 1500 | ft AGL | Threshold for initial climb phase |
+| Landing Altitude | 500 | ft AGL | Altitude variation for landing |
+| **Typical Cruise Alt** | 38,000 | ft | Reference cruise altitude |
+| **Typical Cruise Speed** | 470 | knots | Reference cruise speed (M0.80) |
+
+**Notes**:
+- Long-haul wide-body aircraft
+- Predecessor to the 777 and 787
+- Typical routes: 2,000-6,000 nm
+
 #### Boeing 777
 **Code**: `B777`
 
