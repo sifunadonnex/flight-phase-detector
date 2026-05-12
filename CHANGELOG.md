@@ -2,6 +2,23 @@
 
 All notable changes to the Flight Phase Detection System.
 
+## [2.2.0] - 2026-05-12
+
+### Added - New Aircraft Support
+- **Boeing 767 Profile**: Added a new aircraft profile for the Boeing 767 (`B767`) with optimized performance thresholds for this wide-body jet.
+
+### Enhanced - Data Ingestion & Flexibility
+- **Expanded Column Mapping**: The system now recognizes a wider variety of column names for core parameters like `airspeed` and `altitude`.
+- **Improved Robustness**: The detector can now handle more diverse CSV formats, as demonstrated with the `5Y-SVR.csv` (B767) dataset.
+
+### Fixed - Parameter Misinterpretation
+- **Corrected Vertical Speed Source**: Fixed a bug where `Vertical acceleration` was incorrectly being used as the primary source for vertical speed, leading to inaccurate phase detection. The system now correctly prioritizes actual vertical speed columns.
+
+### Enhanced - Documentation
+- Updated `AIRCRAFT_CONFIGURATIONS.md`, `README.md`, and `QUICKSTART.md` to include the new Boeing 767 profile and usage examples.
+
+---
+
 ## [2.1.0] - 2025
 
 ### Added - Enhanced Parameter Integration
